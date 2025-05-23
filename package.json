@@ -1,0 +1,10 @@
+{
+  "name": "tg-archive-site",
+  "version": "1.0.0",
+  "dependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  },
+  "scripts": {
+    "build": "eleventy --output=site"
+  }
+}

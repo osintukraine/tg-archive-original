@@ -47,4 +47,12 @@ Edit the generated `template.html` and static assets in the `./static` directory
 - Setup a cron job to periodically sync messages and re-publish the archive.
 - Downloading large media files and long message history from large groups continuously may run into Telegram API's rate limits. Watch the debug output.
 
+## Eleventy build
+Install Node dependencies and build the static site using Eleventy.
+
+```bash
+npm install
+npm run build
+```
+
 Licensed under the MIT license.

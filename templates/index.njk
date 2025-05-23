@@ -1,0 +1,6 @@
+<h1>Telegram Archive</h1>
+<ul>
+{% for msg in messages %}
+  <li>{{ msg.sender }}: {{ msg.text }}</li>
+{% endfor %}
+</ul>
