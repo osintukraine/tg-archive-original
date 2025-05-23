@@ -1,0 +1,10 @@
+{
+  "name": "tg-archive-eleventy",
+  "private": true,
+  "scripts": {
+    "build": "eleventy"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^2.0.0"
+  }
+}

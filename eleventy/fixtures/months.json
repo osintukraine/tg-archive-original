@@ -1,0 +1,25 @@
+[
+  {
+    "slug": "2024-01",
+    "label": "Jan 2024",
+    "count": 1,
+    "date": "2024-01-01",
+    "messages": [
+      {
+        "id": 1,
+        "type": "message",
+        "date": "2024-01-01T10:00:00Z",
+        "content": "Hello world",
+        "user": {
+          "username": "user1",
+          "first_name": "User",
+          "last_name": "One",
+          "avatar": ""
+        }
+      }
+    ],
+    "dayline": [
+      {"slug": "2024-01-01", "label": "01 Jan 2024", "count": 1, "page": 1, "date": "2024-01-01"}
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+---
+pagination:
+  data: months
+  size: 1
+  alias: month
+permalink: "{{ month.slug }}{% if pagination.pageNumber > 0 %}_{{ pagination.pageNumber + 1 }}{% endif %}.html"
+---
+{% set total_pages = (month.messages | length / config.per_page) | ceil %}
+{% set messages = month.messages | slice(pagination.pageNumber * config.per_page, config.per_page) %}
+{% set dayline = month.dayline %}
+{% set pagination = {current: pagination.pageNumber + 1, total: total_pages} %}
+{% include "layouts/template.njk" %}
