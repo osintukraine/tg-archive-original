@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1001,
+    "date": "2025-03-01T12:34:56Z",
+    "page": "2025-03.html",
+    "content": "Hello world",
+    "user": {"username": "alice"}
+  },
+  {
+    "id": 1002,
+    "date": "2025-03-01T13:00:00Z",
+    "page": "2025-03.html",
+    "content": "Picture of a cat",
+    "user": {"username": "bob"},
+    "media": {"url": "photo_1.jpg", "mime": "image/jpeg", "length": 0}
+  },
+  {
+    "id": 1003,
+    "date": "2025-03-02T08:15:00Z",
+    "page": "2025-03.html",
+    "content": "Another message",
+    "user": {"username": "carol"}
+  }
+]

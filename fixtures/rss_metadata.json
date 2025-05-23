@@ -1,0 +1,8 @@
+{
+  "site_url": "https://mysite.com",
+  "site_name": "@{group} - Telegram group archive",
+  "site_description": "Public archive of Telegram messages.",
+  "group": "example",
+  "version": "1.3.0",
+  "media_dir": "media"
+}
