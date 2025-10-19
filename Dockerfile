@@ -1,13 +1,15 @@
 # Multi-stage build for tg-archive
 FROM python:3.12-alpine AS builder
 
-# Install build dependencies
+# Install build dependencies including Rust for cryptg
 RUN apk --no-cache add \
     gcc \
     musl-dev \
     libffi-dev \
     python3-dev \
-    build-base
+    build-base \
+    cargo \
+    rust
 
 WORKDIR /usr/src/app
 
