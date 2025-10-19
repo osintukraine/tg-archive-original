@@ -22,4 +22,7 @@ if [ -n "$CONFIG_PATH" ]; then
     cd "$CONFIG_DIR"
 fi
 
+# Keep /usr/src/app in PYTHONPATH so tgarchive module can be found
+export PYTHONPATH=/usr/src/app:$PYTHONPATH
+
 sh -c "python3 -m tgarchive $*"
