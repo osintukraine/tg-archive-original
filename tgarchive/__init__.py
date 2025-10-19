@@ -57,9 +57,9 @@ _CONFIG = {
 
 
 def get_config(path):
-    config = {}
+    config = _CONFIG.copy()
     with open(path, "r") as f:
-        config = {**_CONFIG, **yaml.safe_load(f.read())}
+        config.update(yaml.safe_load(f.read()))
     return config
 
 

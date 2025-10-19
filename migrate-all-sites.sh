@@ -217,7 +217,7 @@ rebuild_site() {
     fi
 
     echo "Building site..." | tee -a "$MIGRATION_LOG"
-    echo "Command: python -c \"from tgarchive import main; main()\" \\" | tee -a "$MIGRATION_LOG"
+    echo "Command: python3 -c \"from tgarchive import main; main()\" \\" | tee -a "$MIGRATION_LOG"
     echo "  --config=\"$site_dir/config.yaml\" \\" | tee -a "$MIGRATION_LOG"
     echo "  --data=\"$site_dir/data.sqlite\" \\" | tee -a "$MIGRATION_LOG"
     echo "  --template=\"$site_dir/template.html\" \\" | tee -a "$MIGRATION_LOG"
@@ -226,7 +226,7 @@ rebuild_site() {
 
     # Run the build locally (change to tg-archive-fork directory)
     cd "$SCRIPT_DIR"
-    python -c "from tgarchive import main; main()" \
+    python3 -c "from tgarchive import main; main()" \
         --config="$site_dir/config.yaml" \
         --data="$site_dir/data.sqlite" \
         --template="$site_dir/template.html" \

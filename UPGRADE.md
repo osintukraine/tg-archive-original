@@ -46,7 +46,7 @@ The script will:
 - 📊 Show build statistics and where generated files are
 - 📝 Create detailed migration log
 
-**Note**: The rebuild uses local Python (`python -c "from tgarchive import main; main()"`), not Docker. Ensure you have tgarchive dependencies installed.
+**Note**: The rebuild uses local Python 3 (`python3 -c "from tgarchive import main; main()"`), not Docker. Ensure you have tgarchive dependencies installed.
 
 ### Single Site Migration
 
@@ -149,7 +149,7 @@ After updating files, rebuild your site using local Python:
 # From the tg-archive-fork directory
 cd /path/to/tg-archive-fork
 
-python -c "from tgarchive import main; main()" \
+python3 -c "from tgarchive import main; main()" \
   --config=/home/tg-archive/sites/amplifyukraine/config.yaml \
   --data=/home/tg-archive/sites/amplifyukraine/data.sqlite \
   --template=/home/tg-archive/sites/amplifyukraine/template.html \
