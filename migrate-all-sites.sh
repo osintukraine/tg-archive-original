@@ -238,19 +238,19 @@ rebuild_site() {
     fi
 
     echo "Building site..." | tee -a "$MIGRATION_LOG"
-    echo "Command: python3 -c \"from tgarchive import main; main()\" \\" | tee -a "$MIGRATION_LOG"
-    echo "  --config=\"$site_dir/config.yaml\" \\" | tee -a "$MIGRATION_LOG"
-    echo "  --data=\"$site_dir/data.sqlite\" \\" | tee -a "$MIGRATION_LOG"
-    echo "  --template=\"$site_dir/template.html\" \\" | tee -a "$MIGRATION_LOG"
+    echo "Command: cd \"$site_dir\" && PYTHONPATH=\"$SCRIPT_DIR\" python3 -c \"from tgarchive import main; main()\" \\" | tee -a "$MIGRATION_LOG"
+    echo "  --config=config.yaml \\" | tee -a "$MIGRATION_LOG"
+    echo "  --data=data.sqlite \\" | tee -a "$MIGRATION_LOG"
+    echo "  --template=template.html \\" | tee -a "$MIGRATION_LOG"
     echo "  --build" | tee -a "$MIGRATION_LOG"
     echo "" | tee -a "$MIGRATION_LOG"
 
-    # Run the build locally (change to tg-archive-fork directory)
-    cd "$SCRIPT_DIR"
-    python3 -c "from tgarchive import main; main()" \
-        --config="$site_dir/config.yaml" \
-        --data="$site_dir/data.sqlite" \
-        --template="$site_dir/template.html" \
+    # Run the build from the site directory so relative paths work
+    cd "$site_dir"
+    PYTHONPATH="$SCRIPT_DIR" python3 -c "from tgarchive import main; main()" \
+        --config=config.yaml \
+        --data=data.sqlite \
+        --template=template.html \
         --build 2>&1 | tee -a "$MIGRATION_LOG"
 
     local build_status=$?
