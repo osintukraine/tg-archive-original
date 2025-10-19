@@ -38,6 +38,7 @@ COPY LICENSE ./
 COPY MANIFEST.in ./
 COPY README.md ./
 COPY setup.py ./
+COPY requirements.txt ./
 COPY entrypoint.sh ./
 
 # Install tgarchive as a package
