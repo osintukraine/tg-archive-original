@@ -2,4 +2,4 @@
 
 set -e
 
-exec python3 -m tgarchive "$@"
+sh -c "python3 -m tgarchive $*"

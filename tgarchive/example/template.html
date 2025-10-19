@@ -158,32 +158,30 @@
 													</li>
 												{% endfor %}
 											</ul>
-										</div>									
-									{% elif m.media.type == "photo" %}
-										{% set ext = m.media.url.split('/')[-1].split('.')[-1].lower() %}
-										{% if ext in ['mp4', 'webm', 'ogg', 'ogv', 'oga', 'mov'] %}
-											<video class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
-												   title="{{ m.media.title }}"
-												   {% if m.media.thumb %}poster="{{ config.media_dir }}/{{ m.media.thumb }}"{% endif %}
-												   controls>
-											</video>
-											<p><a href="{{ config.media_dir }}/{{ m.media.url }}">{{ m.media.title }}</a></p>
-										{% elif ext in ['webp'] %}
-											<a href="{{ config.media_dir }}/{{ m.media.url }}">
-												<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}" class="media-webp" />
-											</a>
-										{% elif m.media.thumb %}
-											<a href="{{ config.media_dir }}/{{ m.media.url }}">
-												<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" /><br />
-												<span class="filename">{{ m.media.title }}</span>
-											</a>
-										{% else %}
-											<a href="{{ config.media_dir }}/{{ m.media.url }}">
-												<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}" title="{{ m.media.title }}" />
-											</a>
-										{% endif %}
+										</div>
+									{% elif "video" in m.media.type %}
+										<video class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   title="{{ m.media.title }}"
+											   poster="{{ config.media_dir }}/{{ m.media.thumb }}"
+											   controls>
+										</video>
+									{% elif "audio" in m.media.type %}
+										<audio class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   title="{{ m.media.title }}"
+											   controls>
+										</audio>
+									{% elif "image" in m.media.type %}
+										<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   title="{{ m.media.title }}" />
 									{% else %}
-										<a href="{{ config.media_dir }}/{{ m.media.url }}">{{ m.media.title }}</a>
+										<embed type="{{ m.media.type }}" src="{{ config.media_dir }}/{{ m.media.url }}">
+											{% if m.media.thumb %}
+												<a href="{{ config.media_dir }}/{{ m.media.url }}">
+													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" /><br />
+												</a>
+											{% endif %}
+											<span class="filename">{{ m.media.title }}</span>
+										</embed>
 									{% endif %}
 								</div>
 							{% endif %}
