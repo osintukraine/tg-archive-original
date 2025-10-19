@@ -21,22 +21,42 @@ This fork includes several improvements:
 
 ## Quick Migration
 
-Use the provided migration script:
+### Batch Migration (Recommended)
+
+Migrate all sites in a directory at once with optional rebuild:
 
 ```bash
 # From the tg-archive-fork directory
+
+# Text/image archives
+./migrate-all-sites.sh /home/tg-archive/sites --rebuild
+
+# Video archives
+./migrate-all-sites.sh /home/tg-archive-video/sites --rebuild
+```
+
+The script will:
+- 🔍 Auto-detect all sites (any directory with config.yaml)
+- 📦 Backup existing files to `backup-YYYYMMDD-HHMMSS/` in each site
+- ✅ Update template.html with lazy loading and cache busting
+- ✅ Add lozad.min.js to static directory
+- ✅ Update main.js and styles.css
+- 🏗️ Perform full rebuild (if --rebuild flag used)
+- 📊 Show build statistics and where generated files are
+- 📝 Create detailed migration log
+
+### Single Site Migration
+
+For migrating just one site:
+
+```bash
 ./migrate-site.sh /path/to/your/site
 
 # Example:
 ./migrate-site.sh /home/tg-archive/sites/amplifyukraine
 ```
 
-The script will:
-- ✅ Backup your existing files to `backup-YYYYMMDD-HHMMSS/`
-- ✅ Update template.html with lazy loading and cache busting
-- ✅ Add lozad.min.js to static directory
-- ✅ Update main.js with lozad initialization
-- ✅ Show you which config options to add
+Note: This only updates templates/static files - you'll need to rebuild manually.
 
 ## Manual Migration
 
