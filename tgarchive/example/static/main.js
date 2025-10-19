@@ -1,5 +1,15 @@
 (function() {
-	// Hide the open burger menu when clicking nav links. 
+	// Initialize lazy loading for media with lozad
+	if (typeof lozad !== 'undefined') {
+		const observer = lozad('.lozad', {
+			loaded: function(el) {
+				el.classList.add('loaded');
+			}
+		});
+		observer.observe();
+	}
+
+	// Hide the open burger menu when clicking nav links.
 	const burger = document.querySelector("#burger");
 	document.querySelectorAll(".timeline a, .dayline a").forEach((e) => {
 		e.onclick = () => {

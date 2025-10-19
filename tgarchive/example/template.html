@@ -22,8 +22,10 @@
 	{% endif %}
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"> 
-	<link href="static/style.css" rel="stylesheet" type="text/css" />	
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+	<link href="static/style.css" rel="stylesheet" type="text/css" />
+	<script src="static/lozad.min.js"></script>
+	<script src="static/main.js?{{ config.build_timestamp }}"></script>
 </head>
 <body>
 
@@ -160,21 +162,25 @@
 									{% elif m.media.type == "photo" %}
 										{% set ext = m.media.url.split('/')[-1].split('.')[-1].lower() %}
 										{% if ext in ['mp4', 'webm', 'ogg', 'ogv', 'oga', 'mov'] %}
-											<video controls>
-												<source src="{{ config.media_dir }}/{{ m.media.url }}">
+											<video class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+												   title="{{ m.media.title }}"
+												   {% if m.media.thumb %}poster="{{ config.media_dir }}/{{ m.media.thumb }}"{% endif %}
+												   controls>
 											</video>
 											<p><a href="{{ config.media_dir }}/{{ m.media.url }}">{{ m.media.title }}</a></p>
 										{% elif ext in ['webp'] %}
 											<a href="{{ config.media_dir }}/{{ m.media.url }}">
-												<img src="{{ config.media_dir }}/{{ m.media.url }}" class="media-webp" />
+												<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}" class="media-webp" />
 											</a>
 										{% elif m.media.thumb %}
 											<a href="{{ config.media_dir }}/{{ m.media.url }}">
-												<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" /><br />
+												<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" /><br />
 												<span class="filename">{{ m.media.title }}</span>
 											</a>
 										{% else %}
-											<a href="{{ config.media_dir }}/{{ m.media.url }}">{{ m.media.title }}</a>
+											<a href="{{ config.media_dir }}/{{ m.media.url }}">
+												<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}" title="{{ m.media.title }}" />
+											</a>
 										{% endif %}
 									{% else %}
 										<a href="{{ config.media_dir }}/{{ m.media.url }}">{{ m.media.title }}</a>
