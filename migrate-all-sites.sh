@@ -217,22 +217,19 @@ rebuild_site() {
     fi
 
     echo "Building site..." | tee -a "$MIGRATION_LOG"
-    echo "Command: docker run --rm --user=\"\$(id -u):\$(id -g)\" \\" | tee -a "$MIGRATION_LOG"
-    echo "  -v \"$SITES_ROOT:/sites\" \\" | tee -a "$MIGRATION_LOG"
-    echo "  tg-archive:latest \\" | tee -a "$MIGRATION_LOG"
-    echo "  --config=/sites/$site_name/config.yaml \\" | tee -a "$MIGRATION_LOG"
-    echo "  --data=/sites/$site_name/data.sqlite \\" | tee -a "$MIGRATION_LOG"
-    echo "  --template=/sites/$site_name/template.html \\" | tee -a "$MIGRATION_LOG"
+    echo "Command: python -c \"from tgarchive import main; main()\" \\" | tee -a "$MIGRATION_LOG"
+    echo "  --config=\"$site_dir/config.yaml\" \\" | tee -a "$MIGRATION_LOG"
+    echo "  --data=\"$site_dir/data.sqlite\" \\" | tee -a "$MIGRATION_LOG"
+    echo "  --template=\"$site_dir/template.html\" \\" | tee -a "$MIGRATION_LOG"
     echo "  --build" | tee -a "$MIGRATION_LOG"
     echo "" | tee -a "$MIGRATION_LOG"
 
-    # Run the build
-    docker run --rm --user="$(id -u):$(id -g)" \
-        -v "$SITES_ROOT:/sites" \
-        tg-archive:latest \
-        --config=/sites/$site_name/config.yaml \
-        --data=/sites/$site_name/data.sqlite \
-        --template=/sites/$site_name/template.html \
+    # Run the build locally (change to tg-archive-fork directory)
+    cd "$SCRIPT_DIR"
+    python -c "from tgarchive import main; main()" \
+        --config="$site_dir/config.yaml" \
+        --data="$site_dir/data.sqlite" \
+        --template="$site_dir/template.html" \
         --build 2>&1 | tee -a "$MIGRATION_LOG"
 
     local build_status=$?

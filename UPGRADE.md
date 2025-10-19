@@ -16,8 +16,9 @@ This fork includes several improvements:
 
 ## Prerequisites
 
-- Docker image built as `tg-archive:latest` (see main README)
-- Existing site directory with config.yaml, data.sqlite, template.html
+- Python 3.12+ with tgarchive dependencies installed (see requirements.txt)
+- Existing site directories with config.yaml, data.sqlite, template.html
+- For Docker-based syncing: Docker image built as `tg-archive:latest` (optional)
 
 ## Quick Migration
 
@@ -41,9 +42,11 @@ The script will:
 - ✅ Update template.html with lazy loading and cache busting
 - ✅ Add lozad.min.js to static directory
 - ✅ Update main.js and styles.css
-- 🏗️ Perform full rebuild (if --rebuild flag used)
+- 🏗️ Perform full rebuild using local Python (if --rebuild flag used)
 - 📊 Show build statistics and where generated files are
 - 📝 Create detailed migration log
+
+**Note**: The rebuild uses local Python (`python -c "from tgarchive import main; main()"`), not Docker. Ensure you have tgarchive dependencies installed.
 
 ### Single Site Migration
 
@@ -140,8 +143,20 @@ new_on_top: False
 
 ## Rebuild Your Site
 
-After updating files, rebuild your site with the new Docker image:
+After updating files, rebuild your site using local Python:
 
+```bash
+# From the tg-archive-fork directory
+cd /path/to/tg-archive-fork
+
+python -c "from tgarchive import main; main()" \
+  --config=/home/tg-archive/sites/amplifyukraine/config.yaml \
+  --data=/home/tg-archive/sites/amplifyukraine/data.sqlite \
+  --template=/home/tg-archive/sites/amplifyukraine/template.html \
+  --build
+```
+
+**Alternative**: Use Docker if you prefer (requires __main__.py to be added):
 ```bash
 docker run --rm --user="$(id -u):$(id -g)" \
   -v /home/tg-archive/sites:/sites \
