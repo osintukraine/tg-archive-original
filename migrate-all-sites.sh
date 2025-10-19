@@ -65,6 +65,27 @@ if [ ${#SITES[@]} -eq 0 ]; then
     exit 1
 fi
 
+# Check dependencies if --rebuild is specified
+if [ "$DO_REBUILD" = "--rebuild" ]; then
+    echo "Checking Python dependencies..."
+    if ! python3 -c "import magic, feedgen, jinja2, PIL, pytz, yaml, telethon, rich" 2>/dev/null; then
+        echo ""
+        echo "❌ ERROR: Required Python dependencies are not installed!"
+        echo ""
+        echo "Install dependencies with:"
+        echo "  cd $SCRIPT_DIR"
+        echo "  pip3 install -r requirements.txt"
+        echo ""
+        echo "Or install individually:"
+        echo "  pip3 install python-magic feedgen jinja2 Pillow pytz PyYAML telethon rich cryptg"
+        echo ""
+        echo "Then re-run this script."
+        exit 1
+    fi
+    echo "✓ Python dependencies OK"
+    echo ""
+fi
+
 echo "=========================================="
 echo "  TG-Archive Batch Migration Tool"
 echo "=========================================="
