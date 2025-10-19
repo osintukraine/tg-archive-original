@@ -43,8 +43,9 @@ class Build:
         logging.info("Start building.")
 
         self.config['build_timestamp'] = int(datetime.timestamp(datetime.now(timezone.utc)))
+        new_on_top = self.config.get("new_on_top", False)
 
-        timeline = list(self.db.get_timeline())
+        timeline = list(self.db.get_timeline(new_on_top))
         if len(timeline) == 0:
             logging.info("no data found to publish site")
             quit()
@@ -63,7 +64,7 @@ class Build:
             d = None
             prev_d = None
             rendered = False
-            for d in self.db.get_dayline(month.date.year, month.date.month, self.config["per_page"]):
+            for d in self.db.get_dayline(month.date.year, month.date.month, new_on_top, self.config["per_page"]):
                 dayline[d.slug] = d
 
                 # Incremental builds: skip rendering day counter if file exists
@@ -85,15 +86,18 @@ class Build:
             if self.config.get("incremental_builds", False) and not rendered and d:
                 self._render_day_counter(d)
 
-            # Paginate and fetch messages for the month until the end..
-            page = 0
-            last_id = 0
+            # Paginate and fetch messages for the month until the end.
+            # For new_on_top, start from a very high ID and go down
+            # For oldest first, start from 0 and go up
+            last_id = 1000_000_000_000_000_000 if new_on_top else 0
             total = self.db.get_message_count(
                 month.date.year, month.date.month)
             total_pages = math.ceil(total / self.config["per_page"])
+            # For new_on_top, start from last page and count down
+            page = total_pages + 1 if new_on_top else 0
 
             while True:
-                messages = list(self.db.get_messages(month.date.year, month.date.month,
+                messages = list(self.db.get_messages(month.date.year, month.date.month, new_on_top,
                                                      last_id, self.config["per_page"]))
 
                 if len(messages) == 0:
@@ -101,7 +105,8 @@ class Build:
 
                 last_id = messages[-1].id
 
-                page += 1
+                # Update page number based on order
+                page = page - 1 if new_on_top else page + 1
                 fname = self.make_filename(month, page)
 
                 # Collect the message ID -> page name for all messages in the set

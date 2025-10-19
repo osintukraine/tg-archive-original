@@ -97,16 +97,20 @@ class DB:
         id, date = res
         return id, date
 
-    def get_timeline(self) -> Iterator[Month]:
+    def get_timeline(self, new_on_top: bool = False) -> Iterator[Month]:
         """
         Get the list of all unique yyyy-mm month groups and
         the corresponding message counts per period in chronological order.
+
+        Args:
+            new_on_top: If True, returns newest months first (DESC order)
         """
         cur = self.conn.cursor()
-        cur.execute("""
+        order = "DESC" if new_on_top else "ASC"
+        cur.execute(f"""
             SELECT strftime('%Y-%m-%d 00:00:00', date) as "[timestamp]",
             COUNT(*) FROM messages AS count
-            GROUP BY strftime('%Y-%m', date) ORDER BY date
+            GROUP BY strftime('%Y-%m', date) ORDER BY date {order}
         """)
 
         for r in cur.fetchall():
@@ -119,18 +123,25 @@ class DB:
                         label=date.strftime("%b %Y"),
                         count=r[1])
 
-    def get_dayline(self, year, month, limit=500) -> Iterator[Day]:
+    def get_dayline(self, year, month, new_on_top: bool = False, limit=500) -> Iterator[Day]:
         """
         Get the list of all unique yyyy-mm-dd days corresponding
-        message counts and the page number of the first occurrence of 
+        message counts and the page number of the first occurrence of
         the date in the pool of messages for the whole month.
+
+        Args:
+            year: Year to query
+            month: Month to query
+            new_on_top: If True, orders by newest messages first
+            limit: Messages per page
         """
         cur = self.conn.cursor()
-        cur.execute("""
+        order = "DESC" if new_on_top else "ASC"
+        cur.execute(f"""
             SELECT strftime("%Y-%m-%d 00:00:00", date) AS "[timestamp]",
             COUNT(*), PAGE(rank, ?) FROM (
                 SELECT ROW_NUMBER() OVER() as rank, date FROM messages
-                WHERE strftime('%Y%m', date) = ? ORDER BY id
+                WHERE strftime('%Y%m', date) = ? ORDER BY id {order}
             )
             GROUP BY "[timestamp]";
         """, (limit, "{}{:02d}".format(year, month)))
@@ -140,26 +151,60 @@ class DB:
             if self.tz:
                 date = date.astimezone(self.tz)
 
+            cnt = r[1]
+            p = r[2]
+            # For new_on_top, reverse the page numbering
+            if new_on_top:
+                total_pages = math.ceil(cnt / limit) + 1
+                page = total_pages - p
+            else:
+                page = p
+
             yield Day(date=date,
                       slug=date.strftime("%Y-%m-%d"),
                       label=date.strftime("%d %b %Y"),
                       count=r[1],
-                      page=r[2])
+                      page=page)
 
-    def get_messages(self, year, month, last_id=0, limit=500) -> Iterator[Message]:
+    def get_messages(self, year, month, new_on_top: bool = False, last_id=0, limit=500) -> Iterator[Message]:
+        """
+        Get messages for a specific year and month.
+
+        Args:
+            year: Year to query
+            month: Month to query
+            new_on_top: If True, returns newest messages first (DESC order)
+            last_id: Last message ID for pagination
+            limit: Number of messages to return
+        """
         date = "{}{:02d}".format(year, month)
 
         cur = self.conn.cursor()
-        cur.execute("""
-            SELECT messages.id, messages.type, messages.date, messages.edit_date,
-            messages.content, messages.reply_to, messages.user_id,
-            users.username, users.first_name, users.last_name, users.tags, users.avatar,
-            media.id, media.type, media.url, media.title, media.description, media.thumb
-            FROM messages
-            LEFT JOIN users ON (users.id = messages.user_id)
-            LEFT JOIN media ON (media.id = messages.media_id)
-            WHERE strftime('%Y%m', date) = ?
-            AND messages.id > ? ORDER by messages.id LIMIT ?
+        if new_on_top:
+            # Newest first: get messages with ID < last_id, ordered DESC
+            cur.execute("""
+                SELECT messages.id, messages.type, messages.date, messages.edit_date,
+                messages.content, messages.reply_to, messages.user_id,
+                users.username, users.first_name, users.last_name, users.tags, users.avatar,
+                media.id, media.type, media.url, media.title, media.description, media.thumb
+                FROM messages
+                LEFT JOIN users ON (users.id = messages.user_id)
+                LEFT JOIN media ON (media.id = messages.media_id)
+                WHERE strftime('%Y%m', date) = ?
+                AND messages.id < ? ORDER by messages.id DESC LIMIT ?
+            """, (date, last_id, limit))
+        else:
+            # Oldest first: get messages with ID > last_id, ordered ASC
+            cur.execute("""
+                SELECT messages.id, messages.type, messages.date, messages.edit_date,
+                messages.content, messages.reply_to, messages.user_id,
+                users.username, users.first_name, users.last_name, users.tags, users.avatar,
+                media.id, media.type, media.url, media.title, media.description, media.thumb
+                FROM messages
+                LEFT JOIN users ON (users.id = messages.user_id)
+                LEFT JOIN media ON (media.id = messages.media_id)
+                WHERE strftime('%Y%m', date) = ?
+                AND messages.id > ? ORDER by messages.id LIMIT ?
             """, (date, last_id, limit))
 
         for r in cur.fetchall():

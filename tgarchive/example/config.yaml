@@ -63,6 +63,12 @@ show_day_index: True
 # Significantly faster for incremental updates. Set to False to always rebuild everything.
 incremental_builds: True
 
+# Display order - show newest messages first (like a blog) or oldest first (like a forum).
+# True: Newest messages appear on page 1 (blog-style, recommended for news/updates)
+# False: Oldest messages appear on page 1 (forum-style, chronological order)
+# Default: False (maintains backward compatibility)
+new_on_top: False
+
 # URL to link Telegram group names and usernames.
 telegram_url: "https://t.me/{id}"
 
