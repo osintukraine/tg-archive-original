@@ -17,12 +17,11 @@ for arg in "$@"; do
 done
 
 # Change to config directory if config path is provided
+# This allows relative paths for --data and --session to work
 if [ -n "$CONFIG_PATH" ]; then
     CONFIG_DIR=$(dirname "$CONFIG_PATH")
     cd "$CONFIG_DIR"
 fi
 
-# Keep /usr/src/app in PYTHONPATH so tgarchive module can be found
-export PYTHONPATH=/usr/src/app:$PYTHONPATH
-
-sh -c "python3 -m tgarchive $*"
+# Run tgarchive (installed as package, works from any directory)
+exec python3 -m tgarchive "$@"
