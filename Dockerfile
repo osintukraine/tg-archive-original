@@ -40,6 +40,9 @@ COPY README.md ./
 COPY setup.py ./
 COPY entrypoint.sh ./
 
+# Install tgarchive as a package
+RUN pip install --no-cache-dir -e .
+
 RUN chmod +x ./entrypoint.sh
 
 ENTRYPOINT ["./entrypoint.sh"]
