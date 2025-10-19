@@ -3,11 +3,15 @@ from datetime import timezone, datetime
 import logging
 import math
 import os
-import pkg_resources
 import re
 import shutil
 import magic
 from pathlib import Path
+
+try:
+    from importlib.metadata import version
+except ImportError:
+    from importlib_metadata import version
 
 from feedgen.feed import FeedGenerator
 from jinja2 import Template
@@ -181,7 +185,7 @@ class Build:
         f = FeedGenerator()
         f.id(self.config["site_url"])
         f.generator(
-            "tg-archive {}".format(pkg_resources.get_distribution("tg-archive").version))
+            "tg-archive {}".format(version("tg-archive")))
         f.link(href=self.config["site_url"], rel="alternate")
         f.title(self.config["site_name"].format(group=self.config["group"]))
         f.subtitle(self.config["site_description"])
