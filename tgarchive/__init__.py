@@ -4,13 +4,21 @@ import os
 import shutil
 import sys
 import yaml
+from pathlib import Path
 
 from .db import DB
 
 from .__metadata__ import __version__
 
-logging.basicConfig(format="%(asctime)s: %(message)s",
-                    level=logging.INFO)
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s: %(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(rich_tracebacks=True, tracebacks_show_locals=True)]
+)
+log = logging.getLogger("rich")
 
 _CONFIG = {
     "api_id": os.getenv("API_ID", ""),
@@ -20,6 +28,7 @@ _CONFIG = {
     "avatar_size": [64, 64],
     "download_media": False,
     "media_dir": "media",
+    "media_datetime_subdir": "",
     "media_mime_types": [],
     "proxy": {
         "enable": False,
@@ -32,6 +41,7 @@ _CONFIG = {
     "rss_feed_entries": 100,
 
     "publish_dir": "site",
+    "incremental_builds": True,
     "site_url": "https://mysite.com",
     "static_dir": "static",
     "telegram_url": "https://t.me/{id}",

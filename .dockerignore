@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+venv/
+env/
+ENV/
+.venv/
+
+# Session files
+*.session
+*.session-journal
+
+# Config files with credentials
+config.yaml
+config.yml
+sites/*/config.yaml
+sites/*/config.yml
+
+# Generated files
+*.db
+*.sqlite
+*.sqlite3
+sites/*/site/
+publish/
+media/
+sites/*/media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose*.yaml
+Dockerfile*
+
+# Documentation
+*.md
+!README.md
+
+# Tests
+test/
+tests/

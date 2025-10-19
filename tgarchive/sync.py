@@ -6,6 +6,7 @@ import os
 import tempfile
 import shutil
 import time
+from pathlib import Path
 
 from PIL import Image
 from telethon import TelegramClient, errors, sync
@@ -329,17 +330,23 @@ class Sync:
         fpath = self.client.download_media(msg, file=tempfile.gettempdir())
         basename = os.path.basename(fpath)
 
-        newname = "{}.{}".format(msg.id, self._get_file_ext(basename))
-        shutil.move(fpath, os.path.join(self.config["media_dir"], newname))
+        # Organize media into date-based subdirectories if configured
+        subfolder = ""
+        if self.config.get('media_datetime_subdir'):
+            subfolder = msg.date.strftime(self.config['media_datetime_subdir'])
+            Path(self.config["media_dir"], subfolder).mkdir(parents=True, exist_ok=True)
+
+        newname = str(Path(subfolder, f"{msg.id}.{self._get_file_ext(basename)}"))
+        shutil.move(fpath, str(Path(self.config["media_dir"], newname)))
 
         # If it's a photo, download the thumbnail.
         tname = None
         if isinstance(msg.media, telethon.tl.types.MessageMediaPhoto):
             tpath = self.client.download_media(
                 msg, file=tempfile.gettempdir(), thumb=1)
-            tname = "thumb_{}.{}".format(
-                msg.id, self._get_file_ext(os.path.basename(tpath)))
-            shutil.move(tpath, os.path.join(self.config["media_dir"], tname))
+            thumb_filename = f"thumb_{msg.id}.{self._get_file_ext(os.path.basename(tpath))}"
+            tname = str(Path(subfolder, thumb_filename))
+            shutil.move(tpath, str(Path(self.config["media_dir"], tname)))
 
         return basename, newname, tname
 

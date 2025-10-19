@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  tg-archive:
+    image: tg-archive:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: "${CURRENT_UID:-1000:1000}"
+    volumes:
+      - ./:/usr/src/app
+    environment:
+      - API_ID=${API_ID}
+      - API_HASH=${API_HASH}

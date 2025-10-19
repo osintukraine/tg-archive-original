@@ -27,3 +27,47 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Telegram session files (contain authentication tokens)
+*.session
+*.session-journal
+
+# tg-archive specific
+# Real config files with credentials (keep config.yaml.example)
+config.yaml
+config.yml
+sites/*/config.yaml
+sites/*/config.yml
+
+# Generated site output
+sites/*/site/
+publish/
+
+# Downloaded media
+media/
+sites/*/media/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Python virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python version management
+.python-version

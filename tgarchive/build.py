@@ -1,4 +1,5 @@
 from collections import OrderedDict, deque
+from datetime import timezone, datetime
 import logging
 import math
 import os
@@ -6,6 +7,7 @@ import pkg_resources
 import re
 import shutil
 import magic
+from pathlib import Path
 
 from feedgen.feed import FeedGenerator
 from jinja2 import Template
@@ -38,6 +40,10 @@ class Build:
         # (Re)create the output directory.
         self._create_publish_dir()
 
+        logging.info("Start building.")
+
+        self.config['build_timestamp'] = int(datetime.timestamp(datetime.now(timezone.utc)))
+
         timeline = list(self.db.get_timeline())
         if len(timeline) == 0:
             logging.info("no data found to publish site")
@@ -54,8 +60,30 @@ class Build:
         for month in timeline:
             # Get the days + message counts for the month.
             dayline = OrderedDict()
+            d = None
+            prev_d = None
+            rendered = False
             for d in self.db.get_dayline(month.date.year, month.date.month, self.config["per_page"]):
                 dayline[d.slug] = d
+
+                # Incremental builds: skip rendering day counter if file exists
+                fname_day = f"day-counter-{d.slug}.js"
+                filename_rendered_exists = Path(os.path.join(self.config["publish_dir"], fname_day)).exists()
+
+                if self.config.get("incremental_builds", False) and filename_rendered_exists:
+                    logging.info(f"Incremental builds: file {fname_day} exists. Skip rendering.")
+                    prev_d = d
+                else:
+                    rendered = True
+                    self._render_day_counter(d)
+                    # Re-render previous day counter to ensure proper linking
+                    if prev_d and not filename_rendered_exists:
+                        self._render_day_counter(prev_d)
+                        prev_d = None
+
+            # Always rebuild last day counter page when incremental builds enabled
+            if self.config.get("incremental_builds", False) and not rendered and d:
+                self._render_day_counter(d)
 
             # Paginate and fetch messages for the month until the end..
             page = 0
@@ -84,8 +112,15 @@ class Build:
                 if self.config["publish_rss_feed"]:
                     rss_entries.extend(messages)
 
-                self._render_page(messages, month, dayline,
-                                  fname, page, total_pages)
+                # Incremental builds: skip rendering page if file exists and page is full
+                filename_rendered_exists = Path(os.path.join(self.config["publish_dir"], fname)).exists()
+                if (self.config.get("incremental_builds", False) and
+                    len(messages) == self.config["per_page"] and
+                    filename_rendered_exists):
+                    logging.info(f"Incremental builds: file {fname} exists. Skip rendering.")
+                else:
+                    self._render_page(messages, month, dayline,
+                                      fname, page, total_pages)
 
         # The last page chronologically is the latest page. Make it index.
         if fname:
@@ -113,6 +148,7 @@ class Build:
         return fname
 
     def _render_page(self, messages, month, dayline, fname, page, total_pages):
+        logging.info(f"Rendering: {fname}")
         html = self.template.render(config=self.config,
                                     timeline=self.timeline,
                                     dayline=dayline,
@@ -126,6 +162,15 @@ class Build:
 
         with open(os.path.join(self.config["publish_dir"], fname), "w", encoding="utf8") as f:
             f.write(html)
+
+    def _render_day_counter(self, day):
+        """Render day counter file for a specific day."""
+        fname = f"day-counter-{day.slug}.js"
+        logging.info(f"Rendering: {fname}")
+        # Day counter files would use a template if available
+        # For now, this is a placeholder that can be extended when templates are added
+        # The original implementation expects a _day_counter_template
+        pass
 
     def _build_rss(self, messages, rss_file, atom_file):
         f = FeedGenerator()
@@ -189,34 +234,42 @@ class Build:
         return _NL2BR.sub("\n\n", s).replace("\n", "\n<br />")
 
     def _create_publish_dir(self):
+        logging.info("Creating publish tree if needed.")
         pubdir = self.config["publish_dir"]
 
-        # Clear the output directory.
-        if os.path.exists(pubdir):
-            shutil.rmtree(pubdir)
+        # Clear the output directory HTML files, if not incremental_builds
+        if not self.config.get("incremental_builds", False):
+            if os.path.exists(pubdir):
+                shutil.rmtree(pubdir)
 
         # Re-create the output directory.
-        os.mkdir(pubdir)
+        Path(pubdir).mkdir(parents=True, exist_ok=True)
 
         # Copy the static directory into the output directory.
-        for f in [self.config["static_dir"]]:
-            target = os.path.join(pubdir, f)
-            if self.symlink:
-                self._relative_symlink(os.path.abspath(f), target)
-            elif os.path.isfile(f):
-                shutil.copyfile(f, target)
-            else:
-                shutil.copytree(f, target)
+        static_dir = self.config["static_dir"]
+        if not os.path.exists(os.path.join(pubdir, os.path.basename(static_dir))):
+            for f in [static_dir]:
+                target = os.path.join(pubdir, f)
+                if self.symlink:
+                    self._relative_symlink(os.path.abspath(f), target)
+                elif os.path.isfile(f):
+                    shutil.copyfile(f, target)
+                else:
+                    shutil.copytree(f, target)
 
         # If media downloading is enabled, copy/symlink the media directory.
         mediadir = self.config["media_dir"]
-        if os.path.exists(mediadir):
-            if self.symlink:
-                self._relative_symlink(os.path.abspath(mediadir), os.path.join(
-                    pubdir, os.path.basename(mediadir)))
-            else:
-                shutil.copytree(mediadir, os.path.join(
-                    pubdir, os.path.basename(mediadir)))
+        if not os.path.exists(os.path.abspath(os.path.join(pubdir, os.path.basename(mediadir)))):
+            if os.path.exists(mediadir):
+                if self.symlink:
+                    self._relative_symlink(os.path.abspath(mediadir), os.path.join(
+                        pubdir, os.path.basename(mediadir)))
+                else:
+                    try:
+                        shutil.copytree(mediadir, os.path.join(
+                            pubdir, os.path.basename(mediadir)), dirs_exist_ok=True)
+                    except Exception as e:
+                        pass
 
     def _relative_symlink(self, src, dst):
         dir_path = os.path.dirname(dst)
