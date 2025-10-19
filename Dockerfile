@@ -1,38 +1,14 @@
-# Multi-stage build for tg-archive
-FROM python:3.12-alpine AS builder
+FROM alpine:3.13
 
-# Install build dependencies including Rust for cryptg
-RUN apk --no-cache add \
-    gcc \
-    musl-dev \
-    libffi-dev \
-    python3-dev \
-    build-base \
-    cargo \
-    rust
+RUN apk --no-cache update && apk --no-cache add python3 py3-pip py3-wheel python3-dev libffi libffi-dev gcc build-base
 
 WORKDIR /usr/src/app
 
-# Copy and install Python dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
 
-# Final stage
-FROM python:3.12-alpine
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt
 
-# Install runtime dependencies
-RUN apk --no-cache add \
-    libffi \
-    libmagic
-
-WORKDIR /usr/src/app
-
-# Copy Python packages from builder
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy application code
 COPY tgarchive ./tgarchive
 COPY LICENSE ./
 COPY MANIFEST.in ./
@@ -40,7 +16,7 @@ COPY README.md ./
 COPY setup.py ./
 COPY entrypoint.sh ./
 
-RUN chmod +x ./entrypoint.sh
+RUN ["chmod", "+x", "./entrypoint.sh"]
 
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["--help"]
