@@ -361,8 +361,8 @@ if [ "$DO_REBUILD" = "--rebuild" ] && [ ${#REBUILT_SITES[@]} -gt 0 ]; then
     echo "" | tee -a "$MIGRATION_LOG"
     echo "Move the generated files to your web server:" | tee -a "$MIGRATION_LOG"
     for site in "${REBUILT_SITES[@]}"; do
-        local site_dir="$SITES_ROOT/$site"
-        local publish_dir=$(grep "^publish_dir:" "$site_dir/config.yaml" 2>/dev/null | awk '{print $2}' | tr -d '"' | tr -d "'" || echo "site")
+        site_dir="$SITES_ROOT/$site"
+        publish_dir=$(grep "^publish_dir:" "$site_dir/config.yaml" 2>/dev/null | awk '{print $2}' | tr -d '"' | tr -d "'" || echo "site")
         echo "  $site: $SITES_ROOT/$site/$publish_dir/" | tee -a "$MIGRATION_LOG"
     done
     echo "" | tee -a "$MIGRATION_LOG"
