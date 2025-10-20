@@ -249,7 +249,16 @@ class Build:
         # Clear the output directory HTML files, if not incremental_builds
         if not self.config.get("incremental_builds", False):
             if os.path.exists(pubdir):
-                shutil.rmtree(pubdir)
+                # Remove contents instead of directory itself (handles volume mounts)
+                for item in os.listdir(pubdir):
+                    item_path = os.path.join(pubdir, item)
+                    try:
+                        if os.path.isfile(item_path) or os.path.islink(item_path):
+                            os.unlink(item_path)
+                        elif os.path.isdir(item_path):
+                            shutil.rmtree(item_path)
+                    except Exception as e:
+                        logging.warning(f"Failed to remove {item_path}: {e}")
 
         # Re-create the output directory.
         Path(pubdir).mkdir(parents=True, exist_ok=True)
