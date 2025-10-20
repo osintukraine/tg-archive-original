@@ -123,11 +123,16 @@ class Build:
 
                 # Incremental builds: skip rendering page if file exists and page is full
                 filename_rendered_exists = Path(os.path.join(self.config["publish_dir"], fname)).exists()
-                if (self.config.get("incremental_builds", False) and
-                    len(messages) == self.config["per_page"] and
-                    filename_rendered_exists):
+                incremental_enabled = self.config.get("incremental_builds", False)
+                page_is_full = len(messages) == self.config["per_page"]
+
+                if incremental_enabled and page_is_full and filename_rendered_exists:
                     logging.info(f"Incremental builds: file {fname} exists. Skip rendering.")
                 else:
+                    if incremental_enabled and not filename_rendered_exists:
+                        logging.info(f"Rendering {fname}: file does not exist")
+                    elif incremental_enabled and not page_is_full:
+                        logging.info(f"Rendering {fname}: page not full ({len(messages)}/{self.config['per_page']} messages)")
                     self._render_page(messages, month, dayline,
                                       fname, page, total_pages)
 
@@ -246,8 +251,11 @@ class Build:
         logging.info("Creating publish tree if needed.")
         pubdir = self.config["publish_dir"]
 
+        incremental = self.config.get("incremental_builds", False)
+        logging.info(f"Incremental builds setting: {incremental}")
+
         # Clear the output directory HTML files, if not incremental_builds
-        if not self.config.get("incremental_builds", False):
+        if not incremental:
             if os.path.exists(pubdir):
                 # Remove contents instead of directory itself (handles volume mounts)
                 for item in os.listdir(pubdir):
