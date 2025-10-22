@@ -14,6 +14,7 @@ except ImportError:
     from importlib_metadata import version
 
 from feedgen.feed import FeedGenerator
+from htmlmin import minify as minify_html
 from jinja2 import Template
 
 from .db import User, Message
@@ -173,6 +174,10 @@ class Build:
                                                 "total": total_pages},
                                     make_filename=self.make_filename,
                                     nl2br=self._nl2br)
+
+        # Minify HTML unless in debug mode
+        if not self.config.get("debug_mode", False):
+            html = minify_html(html, remove_comments=True, remove_empty_space=True)
 
         with open(os.path.join(self.config["publish_dir"], fname), "w", encoding="utf8") as f:
             f.write(html)

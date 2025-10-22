@@ -43,6 +43,7 @@ _CONFIG = {
     "publish_dir": "site",
     "incremental_builds": True,
     "new_on_top": False,
+    "debug_mode": False,
     "site_url": "https://mysite.com",
     "static_dir": "static",
     "telegram_url": "https://t.me/{id}",
