@@ -161,28 +161,35 @@
 											</ul>
 										</div>
 									{% elif "video" in m.media.type %}
-										<video class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+										<video class="lozad"
+											   data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   src="{{ config.media_dir }}/{{ m.media.url }}"
 											   title="{{ m.media.title }}"
-											   poster="{{ config.media_dir }}/{{ m.media.thumb }}"
-											   controls>
+											   {% if m.media.thumb %}poster="{{ config.media_dir }}/{{ m.media.thumb }}"{% endif %}
+											   controls preload="metadata">
 										</video>
 									{% elif "audio" in m.media.type %}
-										<audio class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+										<audio class="lozad"
+											   data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   src="{{ config.media_dir }}/{{ m.media.url }}"
 											   title="{{ m.media.title }}"
-											   controls>
+											   controls preload="metadata">
 										</audio>
 									{% elif "image" in m.media.type %}
 										<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
 											   title="{{ m.media.title }}" loading="lazy" />
 									{% else %}
-										<embed type="{{ m.media.type }}" src="{{ config.media_dir }}/{{ m.media.url }}">
+										<div class="media-fallback">
 											{% if m.media.thumb %}
 												<a href="{{ config.media_dir }}/{{ m.media.url }}">
-													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" loading="lazy" /><br />
+													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" loading="lazy" alt="{{ m.media.title }}" />
 												</a>
+												<br />
 											{% endif %}
-											<span class="filename">{{ m.media.title }}</span>
-										</embed>
+											<a href="{{ config.media_dir }}/{{ m.media.url }}" class="filename" download>{{ m.media.title }}</a>
+											<br />
+											<small class="media-type">{{ m.media.type }}</small>
+										</div>
 									{% endif %}
 								</div>
 							{% endif %}
