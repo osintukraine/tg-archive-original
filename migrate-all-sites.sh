@@ -238,7 +238,7 @@ rebuild_site() {
     fi
 
     echo "Building site..." | tee -a "$MIGRATION_LOG"
-    echo "Command: cd \"$site_dir\" && PYTHONPATH=\"$SCRIPT_DIR\" python3 -c \"from tgarchive import main; main()\" \\" | tee -a "$MIGRATION_LOG"
+    echo "Command: cd \"$site_dir\" && PYTHONPATH=\"$SCRIPT_DIR\" python3 -m tgarchive \\" | tee -a "$MIGRATION_LOG"
     echo "  --config=config.yaml \\" | tee -a "$MIGRATION_LOG"
     echo "  --data=data.sqlite \\" | tee -a "$MIGRATION_LOG"
     echo "  --template=template.html \\" | tee -a "$MIGRATION_LOG"
@@ -247,7 +247,7 @@ rebuild_site() {
 
     # Run the build from the site directory so relative paths work
     cd "$site_dir"
-    PYTHONPATH="$SCRIPT_DIR" python3 -c "from tgarchive import main; main()" \
+    PYTHONPATH="$SCRIPT_DIR" python3 -m tgarchive \
         --config=config.yaml \
         --data=data.sqlite \
         --template=template.html \
