@@ -21,26 +21,28 @@
 		<link rel="alternate" type="application/atom+xml" title="Atom feed " href="index.atom" />
 	{% endif %}
 
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-	<link href="static/style.css" rel="stylesheet" type="text/css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+	<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"></noscript>
+	<link href="static/style.css?{{ config.build_timestamp }}" rel="stylesheet" type="text/css" />
 	<script src="static/lozad.min.js"></script>
-	<script src="static/main.js?{{ config.build_timestamp }}"></script>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <div class="wrap">
 	<div class="container">
-		<nav class="nav">
+		<nav class="nav" role="navigation" aria-label="Main navigation">
 			<a href="./">@{{ config.group }}</a>
-			<label class="burger" for="burger" tabindex="0"><span></span><span></span><span></span></label>
+			<label class="burger" for="burger" tabindex="0" role="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar"><span></span><span></span><span></span></label>
 		</nav>
 		<input type="checkbox" id="burger" />
 
-		<section class="sidebar" id="sidebar">
+		<section class="sidebar" id="sidebar" role="navigation" aria-label="Timeline navigation">
 			<header class="header">
 				<div class="logo">
-					<a href="{{ config.site_url }}"><img src="static/logo.svg" alt="" /></a>
+					<a href="{{ config.site_url }}"><img src="static/logo.svg" alt="Site logo" /></a>
 					<p class="desc">
 						<a href="{{ config.telegram_url.format(id=config.group) }}" rel="noreferer nopener nofollow">@{{ config.group }}</a> /
 						{{ config.site_description.format(group=config.group, date=config.date) }}
@@ -73,7 +75,7 @@
 			</footer>
 		</section>
 
-		<section class="content">
+		<main class="content" id="main-content" role="main">
 			{% if pagination.total > 1 %}
 				<ul class="pagination top">
 					{% for p in range(1, pagination.total + 1) %}
@@ -95,7 +97,7 @@
 					<li class="message type-{{ m.type }}" id="{{ m.id }}">
 						<div class="avatar">
 							{% if m.user.avatar %}
-								<img src="{{ config.media_dir }}/{{ m.user.avatar }}" alt="" />
+								<img src="{{ config.media_dir }}/{{ m.user.avatar }}" alt="" loading="lazy" />
 							{% endif %}
 						</div>
 
@@ -160,28 +162,35 @@
 											</ul>
 										</div>
 									{% elif "video" in m.media.type %}
-										<video class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+										<video class="lozad"
+											   data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   src="{{ config.media_dir }}/{{ m.media.url }}"
 											   title="{{ m.media.title }}"
-											   poster="{{ config.media_dir }}/{{ m.media.thumb }}"
-											   controls>
+											   {% if m.media.thumb %}poster="{{ config.media_dir }}/{{ m.media.thumb }}"{% endif %}
+											   controls preload="metadata">
 										</video>
 									{% elif "audio" in m.media.type %}
-										<audio class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
+										<audio class="lozad"
+											   data-src="{{ config.media_dir }}/{{ m.media.url }}"
+											   src="{{ config.media_dir }}/{{ m.media.url }}"
 											   title="{{ m.media.title }}"
-											   controls>
+											   controls preload="metadata">
 										</audio>
 									{% elif "image" in m.media.type %}
 										<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
-											   title="{{ m.media.title }}" />
+											   title="{{ m.media.title }}" loading="lazy" />
 									{% else %}
-										<embed type="{{ m.media.type }}" src="{{ config.media_dir }}/{{ m.media.url }}">
+										<div class="media-fallback">
 											{% if m.media.thumb %}
 												<a href="{{ config.media_dir }}/{{ m.media.url }}">
-													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" /><br />
+													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" loading="lazy" alt="{{ m.media.title }}" />
 												</a>
+												<br />
 											{% endif %}
-											<span class="filename">{{ m.media.title }}</span>
-										</embed>
+											<a href="{{ config.media_dir }}/{{ m.media.url }}" class="filename" download>{{ m.media.title }}</a>
+											<br />
+											<small class="media-type">{{ m.media.type }}</small>
+										</div>
 									{% endif %}
 								</div>
 							{% endif %}
@@ -199,9 +208,9 @@
 					{% endfor %}
 				</ul>
 			{% endif %}
-		</section><!-- content -->
+		</main><!-- content -->
 
-		<section class="dayline">
+		<aside class="dayline" role="complementary" aria-label="Day index">
 			{% if config.show_day_index %}
 				<ul class="index">
 				{% for _, d in dayline.items() %}
@@ -213,9 +222,9 @@
 				{% endfor %}
 				</ul>
 			{% endif %}
-		</section>
+		</aside>
 	</div><!-- container -->
 </div>
-<script src="static/main.js"></script>
+<script src="static/main.js?{{ config.build_timestamp }}" defer></script>
 </body>
 </html>

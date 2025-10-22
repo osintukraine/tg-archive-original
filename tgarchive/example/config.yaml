@@ -90,3 +90,7 @@ site_name: "@{group} - Telegram group archive"
 site_description: "Public archive of Telegram messages."
 meta_description: "@{group} {date} - Telegram message archive."
 page_title: "Page {page} - {date} @{group} Telegram message archive."
+
+# Frontend performance optimizations
+# Set to true to disable HTML/CSS/JS minification for debugging
+debug_mode: false
