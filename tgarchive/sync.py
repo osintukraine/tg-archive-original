@@ -376,7 +376,7 @@ class Sync:
 
         im = Image.open(b)
         im.thumbnail(self.config["avatar_size"], Image.LANCZOS)
-        im.save(fpath, "JPEG")
+        im.save(fpath, "JPEG", quality=85, optimize=True, progressive=True)
 
         return fname
 
