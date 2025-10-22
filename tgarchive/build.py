@@ -149,6 +149,9 @@ class Build:
         if self.config["publish_rss_feed"]:
             self._build_rss(rss_entries, "index.rss", "index.atom")
 
+        # Optimize static files (CSS/JS minification)
+        self._optimize_static_files()
+
     def load_template(self, fname):
         with open(fname, "r") as f:
             self.template = Template(f.read(), autoescape=True)
@@ -307,3 +310,48 @@ class Build:
         src = os.path.relpath(src, dir_path)
         dst = os.path.join(dir_path, os.path.basename(src))
         return os.symlink(src, dst)
+
+    def _optimize_static_files(self):
+        """Minify CSS and JS files in the static directory."""
+        import csscompressor
+        from jsmin import jsmin
+
+        static_target = os.path.join(
+            self.config["publish_dir"],
+            os.path.basename(self.config["static_dir"])
+        )
+
+        # Skip if debug mode
+        if self.config.get("debug_mode", False):
+            logging.info("Debug mode: skipping static file optimization")
+            return
+
+        # Minify CSS
+        css_path = os.path.join(static_target, "style.css")
+        if os.path.exists(css_path):
+            logging.info("Minifying CSS...")
+            with open(css_path, 'r', encoding='utf8') as f:
+                css_content = f.read()
+
+            minified_css = csscompressor.compress(css_content)
+
+            with open(css_path, 'w', encoding='utf8') as f:
+                f.write(minified_css)
+
+            reduction = 100 - int(len(minified_css) / len(css_content) * 100)
+            logging.info(f"CSS: {len(css_content)} → {len(minified_css)} bytes ({reduction}% reduction)")
+
+        # Minify main.js
+        js_path = os.path.join(static_target, "main.js")
+        if os.path.exists(js_path):
+            logging.info("Minifying JavaScript...")
+            with open(js_path, 'r', encoding='utf8') as f:
+                js_content = f.read()
+
+            minified_js = jsmin(js_content)
+
+            with open(js_path, 'w', encoding='utf8') as f:
+                f.write(minified_js)
+
+            reduction = 100 - int(len(minified_js) / len(js_content) * 100)
+            logging.info(f"JS: {len(js_content)} → {len(minified_js)} bytes ({reduction}% reduction)")
