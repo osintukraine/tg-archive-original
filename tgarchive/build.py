@@ -13,6 +13,9 @@ try:
 except ImportError:
     from importlib_metadata import version
 
+# Fallback for when package is not installed (PYTHONPATH usage)
+from .__metadata__ import __version__ as package_version
+
 from feedgen.feed import FeedGenerator
 from htmlmin import minify as minify_html
 from jinja2 import Template
@@ -197,8 +200,14 @@ class Build:
     def _build_rss(self, messages, rss_file, atom_file):
         f = FeedGenerator()
         f.id(self.config["site_url"])
-        f.generator(
-            "tg-archive {}".format(version("tg-archive")))
+
+        # Try to get version from package metadata, fall back to internal version
+        try:
+            pkg_version = version("tg-archive")
+        except Exception:
+            pkg_version = package_version
+
+        f.generator("tg-archive {}".format(pkg_version))
         f.link(href=self.config["site_url"], rel="alternate")
         f.title(self.config["site_name"].format(group=self.config["group"]))
         f.subtitle(self.config["site_description"])
