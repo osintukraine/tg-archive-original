@@ -21,11 +21,12 @@
 		<link rel="alternate" type="application/atom+xml" title="Atom feed " href="index.atom" />
 	{% endif %}
 
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-	<link href="static/style.css" rel="stylesheet" type="text/css" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+	<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"></noscript>
+	<link href="static/style.css?{{ config.build_timestamp }}" rel="stylesheet" type="text/css" />
 	<script src="static/lozad.min.js"></script>
-	<script src="static/main.js?{{ config.build_timestamp }}"></script>
 </head>
 <body>
 
@@ -95,7 +96,7 @@
 					<li class="message type-{{ m.type }}" id="{{ m.id }}">
 						<div class="avatar">
 							{% if m.user.avatar %}
-								<img src="{{ config.media_dir }}/{{ m.user.avatar }}" alt="" />
+								<img src="{{ config.media_dir }}/{{ m.user.avatar }}" alt="" loading="lazy" />
 							{% endif %}
 						</div>
 
@@ -172,12 +173,12 @@
 										</audio>
 									{% elif "image" in m.media.type %}
 										<img class="lozad" data-src="{{ config.media_dir }}/{{ m.media.url }}"
-											   title="{{ m.media.title }}" />
+											   title="{{ m.media.title }}" loading="lazy" />
 									{% else %}
 										<embed type="{{ m.media.type }}" src="{{ config.media_dir }}/{{ m.media.url }}">
 											{% if m.media.thumb %}
 												<a href="{{ config.media_dir }}/{{ m.media.url }}">
-													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" /><br />
+													<img src="{{ config.media_dir }}/{{ m.media.thumb }}" class="thumb" loading="lazy" /><br />
 												</a>
 											{% endif %}
 											<span class="filename">{{ m.media.title }}</span>
@@ -216,6 +217,6 @@
 		</section>
 	</div><!-- container -->
 </div>
-<script src="static/main.js"></script>
+<script src="static/main.js?{{ config.build_timestamp }}" defer></script>
 </body>
 </html>
