@@ -29,6 +29,23 @@ body {
 	min-width: 320px;
 }
 
+/* Skip link for accessibility (hidden by default, visible on focus) */
+.skip-link {
+	position: absolute;
+	top: -40px;
+	left: 0;
+	background: var(--primary);
+	color: white;
+	padding: 8px 12px;
+	text-decoration: none;
+	z-index: 1000;
+	border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+	top: 0;
+}
+
 input, textarea, select {
 	font-family: Inter, "Helvetica Neue", "Segoe UI", sans-serif;
 	border: 1px solid #ddd;

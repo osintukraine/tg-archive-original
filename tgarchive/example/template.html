@@ -29,19 +29,20 @@
 	<script src="static/lozad.min.js"></script>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <div class="wrap">
 	<div class="container">
-		<nav class="nav">
+		<nav class="nav" role="navigation" aria-label="Main navigation">
 			<a href="./">@{{ config.group }}</a>
-			<label class="burger" for="burger" tabindex="0"><span></span><span></span><span></span></label>
+			<label class="burger" for="burger" tabindex="0" role="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar"><span></span><span></span><span></span></label>
 		</nav>
 		<input type="checkbox" id="burger" />
 
-		<section class="sidebar" id="sidebar">
+		<section class="sidebar" id="sidebar" role="navigation" aria-label="Timeline navigation">
 			<header class="header">
 				<div class="logo">
-					<a href="{{ config.site_url }}"><img src="static/logo.svg" alt="" /></a>
+					<a href="{{ config.site_url }}"><img src="static/logo.svg" alt="Site logo" /></a>
 					<p class="desc">
 						<a href="{{ config.telegram_url.format(id=config.group) }}" rel="noreferer nopener nofollow">@{{ config.group }}</a> /
 						{{ config.site_description.format(group=config.group, date=config.date) }}
@@ -74,7 +75,7 @@
 			</footer>
 		</section>
 
-		<section class="content">
+		<main class="content" id="main-content" role="main">
 			{% if pagination.total > 1 %}
 				<ul class="pagination top">
 					{% for p in range(1, pagination.total + 1) %}
@@ -207,9 +208,9 @@
 					{% endfor %}
 				</ul>
 			{% endif %}
-		</section><!-- content -->
+		</main><!-- content -->
 
-		<section class="dayline">
+		<aside class="dayline" role="complementary" aria-label="Day index">
 			{% if config.show_day_index %}
 				<ul class="index">
 				{% for _, d in dayline.items() %}
@@ -221,7 +222,7 @@
 				{% endfor %}
 				</ul>
 			{% endif %}
-		</section>
+		</aside>
 	</div><!-- container -->
 </div>
 <script src="static/main.js?{{ config.build_timestamp }}" defer></script>
