@@ -185,10 +185,10 @@ migrate_site() {
             echo "✓ Updated main.js" | tee -a "$MIGRATION_LOG"
         fi
 
-        # Update styles.css
-        if [ -f "$EXAMPLE_DIR/static/styles.css" ]; then
-            cp "$EXAMPLE_DIR/static/styles.css" "$site_dir/static/styles.css"
-            echo "✓ Updated styles.css" | tee -a "$MIGRATION_LOG"
+        # Update style.css
+        if [ -f "$EXAMPLE_DIR/static/style.css" ]; then
+            cp "$EXAMPLE_DIR/static/style.css" "$site_dir/static/style.css"
+            echo "✓ Updated style.css" | tee -a "$MIGRATION_LOG"
         fi
     else
         echo "✗ ERROR: Could not find new static directory" | tee -a "$MIGRATION_LOG"
