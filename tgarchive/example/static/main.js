@@ -9,6 +9,72 @@
 		observer.observe();
 	}
 
+	// Image Modal/Lightbox functionality
+	function initImageModal() {
+		// Create modal element
+		const modal = document.createElement('div');
+		modal.className = 'image-modal';
+		modal.setAttribute('role', 'dialog');
+		modal.setAttribute('aria-label', 'Image viewer');
+
+		const closeBtn = document.createElement('button');
+		closeBtn.className = 'close-modal';
+		closeBtn.textContent = '×';  // Safe: using textContent instead of innerHTML
+		closeBtn.setAttribute('aria-label', 'Close image viewer');
+
+		const img = document.createElement('img');
+		img.alt = 'Full size image';
+
+		modal.appendChild(closeBtn);
+		modal.appendChild(img);
+		document.body.appendChild(modal);
+
+		// Open modal when clicking images
+		document.addEventListener('click', (e) => {
+			// Only handle image clicks in .media containers, not thumbnails
+			if (e.target.tagName === 'IMG' &&
+			    e.target.closest('.messages .media') &&
+			    !e.target.classList.contains('thumb') &&
+			    e.target.hasAttribute('data-src')) {
+				e.preventDefault();
+
+				// Use data-src for lazy loaded images, fallback to src
+				const imgSrc = e.target.getAttribute('data-src') || e.target.src;
+				img.src = imgSrc;
+				img.alt = e.target.getAttribute('title') || 'Full size image';
+				modal.classList.add('active');
+				document.body.style.overflow = 'hidden'; // Prevent background scrolling
+			}
+		});
+
+		// Close modal functions
+		function closeModal() {
+			modal.classList.remove('active');
+			document.body.style.overflow = ''; // Restore scrolling
+			img.src = ''; // Clear image to save memory
+		}
+
+		// Close on button click
+		closeBtn.addEventListener('click', closeModal);
+
+		// Close on background click
+		modal.addEventListener('click', (e) => {
+			if (e.target === modal) {
+				closeModal();
+			}
+		});
+
+		// Close on ESC key
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && modal.classList.contains('active')) {
+				closeModal();
+			}
+		});
+	}
+
+	// Initialize image modal
+	initImageModal();
+
 	// Hide the open burger menu when clicking nav links.
 	const burger = document.querySelector("#burger");
 	document.querySelectorAll(".timeline a, .dayline a").forEach((e) => {

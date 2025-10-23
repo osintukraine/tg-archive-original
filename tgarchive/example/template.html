@@ -162,13 +162,15 @@
 											</ul>
 										</div>
 									{% elif "video" in m.media.type %}
-										<video class="lozad"
-											   data-src="{{ config.media_dir }}/{{ m.media.url }}"
-											   src="{{ config.media_dir }}/{{ m.media.url }}"
-											   title="{{ m.media.title }}"
-											   {% if m.media.thumb %}poster="{{ config.media_dir }}/{{ m.media.thumb }}"{% endif %}
-											   controls preload="metadata">
-										</video>
+										<div class="video-container">
+											<video class="lozad"
+												   data-src="{{ config.media_dir }}/{{ m.media.url }}"
+												   src="{{ config.media_dir }}/{{ m.media.url }}"
+												   title="{{ m.media.title }}"
+												   {% if m.media.thumb %}poster="{{ config.media_dir }}/{{ m.media.thumb }}"{% endif %}
+												   controls preload="metadata">
+											</video>
+										</div>
 									{% elif "audio" in m.media.type %}
 										<audio class="lozad"
 											   data-src="{{ config.media_dir }}/{{ m.media.url }}"
